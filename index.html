@@ -1,1 +1,140 @@
-<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>Roya Resort</title><p style="font-family:sans-serif;text-align:center;margin-top:20vh">Roya Resort</p>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Roya Resort · Project dossier</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,400&family=Montserrat:wght@400;500;600&display=swap">
+<style>
+  :root{--bone:#f4efe5;--ink:#1e1b15;--mut:#6f6a5e;--gold:#a8873b;--gold2:#d9c294;--bg:#14110f}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--bone);
+    font-family:Montserrat,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    display:flex;align-items:center;justify-content:center;padding:28px}
+  .card{width:100%;max-width:420px;text-align:center}
+  .eyebrow{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-bottom:22px}
+  h1{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;font-size:clamp(30px,8vw,44px);
+    line-height:1.05;letter-spacing:.04em;text-transform:uppercase;margin:0}
+  .sub{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:clamp(20px,5vw,28px);
+    color:var(--gold2);margin-top:2px}
+  .rule{width:56px;height:1px;margin:26px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+  p.note{font-size:12px;line-height:1.7;color:#9d968a;margin:0 0 22px}
+  form{display:flex;flex-direction:column;gap:12px}
+  input{font:inherit;font-size:16px;padding:14px 16px;border-radius:2px;text-align:center;
+    color:var(--bone);background:rgba(244,239,229,.06);border:1px solid rgba(244,239,229,.22);
+    letter-spacing:.02em}
+  input:focus{outline:none;border-color:var(--gold)}
+  button{font:inherit;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;
+    padding:14px 16px;border:0;border-radius:2px;background:var(--gold);color:#17140f;cursor:pointer}
+  button:disabled{opacity:.5;cursor:default}
+  .msg{min-height:20px;font-size:12px;margin-top:14px;color:#c78d8d}
+  .prog{margin-top:14px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+  .bar{height:2px;background:rgba(244,239,229,.14);margin-top:10px;border-radius:2px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s ease}
+
+.lang{display:flex;justify-content:center;gap:6px;margin-bottom:26px;font-size:11px;letter-spacing:.22em}
+.lang button,#sw button{font:inherit;font-size:11px;letter-spacing:.22em;font-weight:600;padding:6px 10px;border:1px solid rgba(244,239,229,.22);
+  border-radius:2px;background:transparent;color:#9d968a;cursor:pointer}
+.lang button.on,#sw button.on{background:var(--gold);border-color:var(--gold);color:#17140f}
+#sw{position:fixed;bottom:12px;left:12px;z-index:10001;display:flex;gap:4px;background:rgba(20,17,15,.72);padding:4px;border-radius:3px}
+#sw[hidden]{display:none}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="lang"><button type="button" data-l="en">EN</button><button type="button" data-l="ru">RU</button></div>
+  <h1>Roya Resort</h1>
+  <div class="sub" id="t_sub">Project dossier</div>
+  <div class="rule"></div>
+  <p class="note" id="t_note">This document is confidential and protected.<br>Please enter the password you were given.</p>
+  <form id="f" autocomplete="off">
+    <input id="p" type="password" placeholder="Password" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+    <button id="b" type="submit">Open</button>
+  </form>
+  <div class="msg" id="m"></div>
+  <div class="prog" id="s" hidden><span id="t_load">Loading</span><div class="bar"><i id="i"></i></div></div>
+</div>
+<div id="sw" hidden><button type="button" data-l="en">EN</button><button type="button" data-l="ru">RU</button></div>
+<script>
+(function(){
+  var TXT={"en": {"sub": "Project dossier", "note": "This document is confidential and protected.<br>Please enter the password you were given.", "ph": "Password", "open": "Open", "wrong": "Wrong password. Please try again.", "load": "Loading", "err": "Could not open the document. ", "https": "Please open this page via https://partner.royaresort.com", "old": "This browser is too old to open the document.", "title": "Roya Resort · Project dossier"}, "ru": {"sub": "Досье проекта", "note": "Документ конфиденциален и защищён.<br>Введите пароль, который вы получили.", "ph": "Пароль", "open": "Открыть", "wrong": "Неверный пароль. Попробуйте ещё раз.", "load": "Загрузка", "err": "Не удалось открыть документ. ", "https": "Откройте страницу по адресу https://partner.royaresort.com", "old": "Этот браузер слишком старый, чтобы открыть документ.", "title": "Roya Resort · Досье проекта"}};
+  var f=document.getElementById('f'),p=document.getElementById('p'),b=document.getElementById('b'),
+      m=document.getElementById('m'),s=document.getElementById('s'),bar=document.getElementById('i'),sw=document.getElementById('sw');
+  var lang=null, PW=null, fr=null, cache={}, busy=false;
+  try{ lang=localStorage.getItem('roya-partner-lang'); }catch(e){}
+  if(lang!=='en'&&lang!=='ru'){ lang=((navigator.language||'en').toLowerCase().indexOf('ru')===0)?'ru':'en'; }
+  function setLang(l){
+    lang=l; try{ localStorage.setItem('roya-partner-lang', l); }catch(e){}
+    var t=TXT[l]; document.documentElement.lang=l; document.title=t.title;
+    if(!fr){                                                  // карточка входа ещё на странице
+      document.getElementById('t_sub').textContent=t.sub; document.getElementById('t_note').innerHTML=t.note;
+      p.placeholder=t.ph; b.textContent=t.open; document.getElementById('t_load').textContent=t.load;
+    }
+    [].forEach.call(document.querySelectorAll('[data-l]'),function(x){ x.classList.toggle('on', x.getAttribute('data-l')===l); });
+  }
+  function setBusy(v){ busy=v; [].forEach.call(document.querySelectorAll('[data-l]'),function(x){ x.disabled=v; }); }
+  [].forEach.call(document.querySelectorAll('.lang [data-l]'),function(x){ x.addEventListener('click',function(){
+    if(busy) return; setLang(x.getAttribute('data-l')); m.textContent=''; p.focus(); }); });
+  [].forEach.call(document.querySelectorAll('#sw [data-l]'),function(x){ x.addEventListener('click',function(){
+    var l=x.getAttribute('data-l'), prev=lang; if(busy || l===lang) return;
+    setBusy(true); setLang(l);
+    show(l).catch(function(){ setLang(prev); alert(TXT[prev].err); }).then(function(){ setBusy(false); }); }); });
+  function setBar(x){bar.style.width=Math.round(x*100)+'%';}
+  f.addEventListener('submit',function(e){
+    e.preventDefault(); m.textContent='';
+    if(!window.isSecureContext || !window.crypto || !crypto.subtle){ m.textContent=TXT[lang].https; return; }
+    b.disabled=true; p.disabled=true; s.hidden=false; setBusy(true);
+    PW=p.value;
+    show(lang).then(function(){ setBusy(false); }, function(err){
+      PW=null; s.hidden=true; b.disabled=false; p.disabled=false; setBusy(false); setBar(0);
+      m.textContent = (err && err.name==='OperationError') ? TXT[lang].wrong : TXT[lang].err + (err && err.message ? err.message : '');
+      p.value=''; p.focus();
+    });
+  });
+  async function decrypt(l){
+    if(cache[l]) return cache[l];
+    var meta = await (await fetch('meta.json',{cache:'no-store'})).json();
+    var res = await fetch('payload-'+l+'.bin',{cache:'no-store'});
+    if(!res.ok) throw new Error('payload '+res.status);
+    var total = +res.headers.get('content-length') || 0, got = 0, chunks = [];
+    var reader = res.body && res.body.getReader ? res.body.getReader() : null;
+    if(reader){
+      for(;;){ var r = await reader.read(); if(r.done) break;
+        chunks.push(r.value); got += r.value.length; if(total) setBar(0.75*got/total); }
+    } else { chunks.push(new Uint8Array(await res.arrayBuffer())); setBar(.75); }
+    var buf = new Uint8Array(got || chunks[0].length), off = 0;
+    chunks.forEach(function(c){ buf.set(c, off); off += c.length; });
+    var salt = buf.slice(0,16), iv = buf.slice(16,28), ct = buf.slice(28);
+    var base = await crypto.subtle.importKey('raw', new TextEncoder().encode(PW), 'PBKDF2', false, ['deriveKey']);
+    var key = await crypto.subtle.deriveKey({name:'PBKDF2', salt:salt, iterations:meta.iter, hash:'SHA-256'},
+      base, {name:'AES-GCM', length:256}, false, ['decrypt']);
+    setBar(.85);
+    var gz = await crypto.subtle.decrypt({name:'AES-GCM', iv:iv}, key, ct);
+    setBar(.93);
+    if (typeof DecompressionStream !== 'function') throw new Error(TXT[l].old);
+    var html = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream('gzip'))).blob();
+    setBar(1);
+    cache[l] = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+    return cache[l];
+  }
+  async function show(l){
+    var url = await decrypt(l);
+    if(!fr){
+      fr=document.createElement('iframe');
+      fr.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;background:#14110f;z-index:9999';
+      document.body.appendChild(fr);
+      document.body.style.cssText='margin:0;padding:0;background:#14110f;display:block';
+      var card=document.querySelector('.card'); if(card) card.remove();
+      sw.hidden=false;
+    }
+    fr.setAttribute('title', TXT[l].title);
+    fr.onload=function(){ try{ fr.focus(); }catch(e){} };
+    fr.src=url;
+  }
+  setLang(lang); p.focus();
+})();
+</script>
+</body>
+</html>
